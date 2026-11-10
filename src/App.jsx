@@ -10,10 +10,7 @@ function Square({ value, onSquareClick }) {
   )
 }
 
-function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [isXNext, setIsXNext] = useState(true);
-
+function Board({ isXNext, squares, onPlay }) {
   const winner = checkWinner(squares);
   let status = winner
     ? <b>🎉🎉 Pemenang: {winner}</b>
@@ -24,8 +21,11 @@ function Board() {
 
     const nextSquares = squares.slice(); // Menyalin array agar state squares tidak diubah langsung.
     nextSquares[i] = isXNext ? 'X' : 'O'; // Mengisi kotak pada indeks i dengan 'X' di array salinan.
-    setSquares(nextSquares); // Meminta React memperbarui state dan merender ulang tampilan.
-    setIsXNext(!isXNext);
+
+    /* Dikomentar karena sudah ditangani oleh App dan diganti jadi function onPlay */
+    // setSquares(nextSquares); // Meminta React memperbarui state dan merender ulang tampilan.
+    // setIsXNext(!isXNext);
+    onPlay(nextSquares)
 
     // console.log(squares);
     // console.log(nextSquares);
@@ -81,18 +81,48 @@ function Board() {
 }
 
 function App() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
+  const isXNext = currentMove % 2 === 0; // Langkah genap (0, 2, 4...) giliran X.
+
+  const checkPlayer = (move) => {
+    return (move % 2 !== 0) ? 'X' : 'O';
+  }
+
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  }
+
+  function handleJumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
+
+  /* squares => val, move => idx */
+  const moves = history.map((squares, move) => {
+    const player = checkPlayer(move);
+    let desc = (move > 0)
+      ? `Loncat langkah #${move} (oleh ${player})`
+      : "Mulai Game Terlebih Dahulu!"
+
+    return (
+      <li key={move}>
+        {/* <button >{desc}</button> */}
+        <button onClick={() => handleJumpTo(move)}>{desc}</button>
+      </li>
+    )
+  })
+
   return (
     <>
       <div className='game'>
         <div className="game-board">
-          <Board />
+          <Board isXNext={isXNext} squares={currentSquares} onPlay={handlePlay} />
         </div>
         <div className="game-info">
-          <ol>
-            <li>Lorem, ipsum.</li>
-            <li>Lorem, ipsum.</li>
-            <li>Lorem, ipsum.</li>
-          </ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     </>

@@ -28,3 +28,7 @@ body {
 .status {
     margin-bottom: 15px;
 }
+
+.game {
+    display: flex;
+}
