@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
+// import Header from "./components/Header";
 
 function Square({ value, onSquareClick }) {
   return (
@@ -80,9 +81,6 @@ function Board() {
 }
 
 function App() {
-  const [isXNext, setIsXNext] = useState(true);
-  const [history, setHistory] = useState([Array(9).fill(null)])
-
   return (
     <>
       <div className='game'>
